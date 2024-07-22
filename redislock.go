@@ -61,19 +61,19 @@ func (r *redisLocker) Lock(ctx context.Context, key string) (gocron.Lock, error)
 	if err != nil {
 		return nil, ErrFailedToObtainLock
 	}
-	rl := &redisLock{
+	rl := &RedisLock{
 		mu: mu,
 	}
 	return rl, nil
 }
 
-var _ gocron.Lock = (*redisLock)(nil)
+var _ gocron.Lock = (*RedisLock)(nil)
 
-type redisLock struct {
+type RedisLock struct {
 	mu *redsync.Mutex
 }
 
-func (r *redisLock) Unlock(ctx context.Context) error {
+func (r *RedisLock) Unlock(ctx context.Context) error {
 	unlocked, err := r.mu.UnlockContext(ctx)
 	if err != nil {
 		return ErrFailedToReleaseLock
@@ -85,7 +85,7 @@ func (r *redisLock) Unlock(ctx context.Context) error {
 	return nil
 }
 
-func (r *redisLock) Extend(ctx context.Context) error {
+func (r *RedisLock) Extend(ctx context.Context) error {
 	extended, err := r.mu.ExtendContext(ctx)
 	if err != nil {
 		return err
@@ -97,6 +97,6 @@ func (r *redisLock) Extend(ctx context.Context) error {
 	return nil
 }
 
-func (r *redisLock) Get() *redsync.Mutex {
+func (r *RedisLock) Get() *redsync.Mutex {
 	return r.mu
 }
