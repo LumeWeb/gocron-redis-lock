@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
 	"github.com/go-co-op/gocron/v2"
 	"github.com/go-redsync/redsync/v4"
 	"github.com/go-redsync/redsync/v4/redis/goredis/v9"
@@ -25,6 +24,7 @@ var (
 	ErrFailedToConnectToRedis = errors.New("gocron: failed to connect to redis")
 	ErrFailedToObtainLock     = errors.New("gocron: failed to obtain lock")
 	ErrFailedToReleaseLock    = errors.New("gocron: failed to release lock")
+	ErrFailedToExtendLock     = errors.New("gocron: failed to extend lock")
 )
 
 // NewRedisLocker provides an implementation of the Locker interface using
@@ -80,6 +80,18 @@ func (r *redisLock) Unlock(ctx context.Context) error {
 	}
 	if !unlocked {
 		return ErrFailedToReleaseLock
+	}
+
+	return nil
+}
+
+func (r *redisLock) Extend(ctx context.Context) error {
+	extended, err := r.mu.ExtendContext(ctx)
+	if err != nil {
+		return err
+	}
+	if !extended {
+		return ErrFailedToExtendLock
 	}
 
 	return nil
