@@ -45,17 +45,17 @@ func NewRedisLockerAlways(r redis.UniversalClient, options ...redsync.Option) (g
 func newLocker(r redis.UniversalClient, options ...redsync.Option) gocron.Locker {
 	pool := goredis.NewPool(r)
 	rs := redsync.New(pool)
-	return &redisLocker{rs: rs, options: options}
+	return &RedisLocker{rs: rs, options: options}
 }
 
-var _ gocron.Locker = (*redisLocker)(nil)
+var _ gocron.Locker = (*RedisLocker)(nil)
 
-type redisLocker struct {
+type RedisLocker struct {
 	rs      *redsync.Redsync
 	options []redsync.Option
 }
 
-func (r *redisLocker) Lock(ctx context.Context, key string) (gocron.Lock, error) {
+func (r *RedisLocker) Lock(ctx context.Context, key string) (gocron.Lock, error) {
 	mu := r.rs.NewMutex(key, r.options...)
 	err := mu.LockContext(ctx)
 	if err != nil {
