@@ -96,3 +96,7 @@ func (r *redisLock) Extend(ctx context.Context) error {
 
 	return nil
 }
+
+func (r *redisLock) Get() *redsync.Mutex {
+	return r.mu
+}
